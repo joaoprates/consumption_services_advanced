@@ -31,52 +31,112 @@ class _HomeState extends State<Home> {
     
   }
 
+  _post() async {
+
+    var corpo = json.encode(
+        {
+          "userId": 120,
+          "id": null,
+          "title": "Titulo",
+          "body": "Corpo da postagem"
+        }
+    );
+
+    http.Response response = await http.post(
+        _urlBase + "/posts",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      },
+      body: corpo
+    );
+
+    print("resposta: ${response.statusCode}");
+    print("resposta: ${response.body}");
+
+  }
+
+  _put(){
+
+  }
+
+  _patch(){
+
+  }
+
+  _delete(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Consumo de serviço avançado"),
       ),
-      body: FutureBuilder<List<Post>>(
-        future: _recuperarPostagens(),
-        builder: (context, snapshot){
-          switch( snapshot.connectionState ){
-            case ConnectionState.none :
-            case ConnectionState.waiting :
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-              break;
-            case ConnectionState.active :
-            case ConnectionState.done :
-              if( snapshot.hasError ){
-                print("lista: Erro ao carregar ");
-              }else {
+      body: Container(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                RaisedButton(
+                  child: Text("Salvar"),
+                  onPressed: _post,
+                ),
+                RaisedButton(
+                  child: Text("Atualizar"),
+                  onPressed: _post,
+                ),
+                RaisedButton(
+                  child: Text("Remover"),
+                  onPressed: _post,
+                ),
+              ],
+            ),
+            Expanded(
+              child: FutureBuilder<List<Post>>(
+                future: _recuperarPostagens(),
+                builder: (context, snapshot){
 
-                print("lista: carregou!! ");
-                return ListView.builder(
-                  itemCount: snapshot.data.length,
-                    itemBuilder: (context, index){
-
-                      List<Post> lista = snapshot.data;
-                      Post post = lista[index];
-
-                      return ListTile(
-                        title: Text( post.title ),
-                        subtitle: Text( post.id.toString() ),
+                  switch( snapshot.connectionState ){
+                    case ConnectionState.none :
+                    case ConnectionState.waiting :
+                      return Center(
+                        child: CircularProgressIndicator(),
                       );
-                    
-                    }
-                );
+                      break;
+                    case ConnectionState.active :
+                    case ConnectionState.done :
+                      if( snapshot.hasError ){
+                        print("lista: Erro ao carregar ");
+                      }else {
+                        return ListView.builder(
+                            itemCount: snapshot.data.length,
+                            itemBuilder: (context, index){
 
-              }
-              break;
-          }
-          return Center(
-            child: Text("Nothing to show!"),
-          );
+                              List<Post> lista = snapshot.data;
+                              Post post = lista[index];
 
-        },
+                              return ListTile(
+                                title: Text( post.title ),
+                                subtitle: Text( post.id.toString() ),
+                              );
+
+                            }
+                        );
+
+                      }
+                      break;
+                  }
+
+                },
+              ),
+            )
+
+
+
+          ],
+        ),
       ),
     );
   }
